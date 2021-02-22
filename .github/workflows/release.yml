@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  check_suite:
+    types: [completed]
+
+jobs:
+  release:
+    name: Check and Release New Version
+    runs-on: ubuntu-latest
+    # `github.ref` from the `check_suite` trigger is always the default branch
+    if: format('refs/heads/{0}', github.event.check_suite.head_branch) == github.ref && github.event.check_suite.conclusion == 'success'
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+
+    - name: Setup Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: 2.6
+
+    - name: Release Gem
+      id: release-gem
+      uses: salsify/action-release-gem@v1.1.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
