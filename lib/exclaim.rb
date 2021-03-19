@@ -2,6 +2,7 @@
 
 require 'logger'
 require 'exclaim/version'
+require 'exclaim/errors'
 require 'exclaim/utilities'
 
 module Exclaim
