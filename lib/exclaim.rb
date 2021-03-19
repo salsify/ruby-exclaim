@@ -13,6 +13,7 @@ require 'exclaim/bind'
 require 'exclaim/ui_configuration'
 require 'exclaim/renderer'
 require 'exclaim/ui'
+require 'exclaim/railtie' if defined?(Rails)
 
 module Exclaim
   extend Utilities
