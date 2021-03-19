@@ -4,6 +4,9 @@ require 'logger'
 require 'exclaim/version'
 require 'exclaim/errors'
 require 'exclaim/utilities'
+require 'exclaim/implementation_map'
+require 'exclaim/implementations/example_implementation_map'
+require 'exclaim/ui'
 
 module Exclaim
   extend Utilities
