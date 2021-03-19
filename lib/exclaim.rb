@@ -11,6 +11,7 @@ require 'exclaim/component'
 require 'exclaim/helper'
 require 'exclaim/bind'
 require 'exclaim/ui_configuration'
+require 'exclaim/renderer'
 require 'exclaim/ui'
 
 module Exclaim

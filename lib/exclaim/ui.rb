@@ -2,7 +2,7 @@
 
 module Exclaim
   class Ui
-    attr_reader :implementation_map, :parsed_ui
+    attr_reader :implementation_map, :parsed_ui, :renderer
 
     def initialize(implementation_map: Exclaim::Implementations.example_implementation_map)
       @implementation_map = Exclaim::ImplementationMap.parse!(implementation_map)
@@ -15,6 +15,20 @@ module Exclaim
 
     def parse_ui!(ui_config)
       self.parsed_ui = Exclaim::UiConfiguration.parse!(@implementation_map, ui_config)
+    rescue Exclaim::Error
+      raise
+    rescue StandardError => e
+      e.extend(Exclaim::InternalError)
+      raise
+    end
+
+    def render(env: {})
+      if parsed_ui.nil?
+        error_message = 'Cannot render without UI configured, must call Exclaim::Ui#parse_ui(ui_config) first'
+        raise RenderingError.new(error_message)
+      end
+
+      renderer.call(env: env)
     rescue Exclaim::Error
       raise
     rescue StandardError => e
@@ -52,6 +66,7 @@ module Exclaim
 
     def parsed_ui=(value)
       @parsed_ui = value
+      @renderer = Exclaim::Renderer.new(@parsed_ui)
     end
 
     def bind_paths(config_value, accumulator)
