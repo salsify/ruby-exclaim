@@ -785,8 +785,7 @@ To release a new version, update the version number in `version.rb`. When merged
 to the default branch, [a GitHub action](.github/workflows/release.yml) will
 automatically will create a git tag for the version, push git commits and tags,
 and push the `.gem` file to
-[rubygems.org](https://rubygems.org)
-.
+[rubygems.org](https://rubygems.org).
 
 ## Contributing
 
