@@ -6,6 +6,11 @@ require 'exclaim/errors'
 require 'exclaim/utilities'
 require 'exclaim/implementation_map'
 require 'exclaim/implementations/example_implementation_map'
+require 'exclaim/implementable'
+require 'exclaim/component'
+require 'exclaim/helper'
+require 'exclaim/bind'
+require 'exclaim/ui_configuration'
 require 'exclaim/ui'
 
 module Exclaim
