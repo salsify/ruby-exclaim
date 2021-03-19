@@ -20,7 +20,7 @@ module Exclaim
           yield config['do'], env # yields to render_child block
         end
 
-        Exclaim.join_lines(resolved_items)
+        resolved_items.map { |line| line.end_with?("\n") ? line : "#{line}\n" }.join
       ensure
         env.delete(bind_reference)
         env[bind_reference] = original_bind_value if original_env_includes_bind_reference
