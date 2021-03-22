@@ -28,7 +28,7 @@
 
 ## What and Why
 
-Exclaim is a JSON format to declaratively specify a UI. The JSON references named UI components.
+Exclaim is a JSON format to declaratively specify a UI. The JSON includes references to named UI components.
 You supply the Ruby implementations of these components.
 
 For example, here is an Exclaim declaration of a `text` component:
@@ -69,8 +69,8 @@ These `text` and `image` components are just examples - Exclaim does not require
 The needs of your domain determine the mix of components to implement.
 
 By implementing more complex components, including ones that accept nested child components,
-you prepare the building blocks to specify a full UI. Then this library will parse the JSON representing
-an arbitrary UI composed of those component references, and call your implementations to render it.
+you prepare the building blocks to specify a full UI. Then, this library will accept JSON values representing
+arbitrary UIs composed of those component references, and call your implementations to render them.
 
 ### Design Goals
 
@@ -85,13 +85,14 @@ Exclaim component implementations still must handle these issues (see [Security 
 but JSON provides an easier starting point.
 
 Other good solutions exist that fulfill slightly different needs.
-[HTML](https://developer.mozilla.org/en-US/docs/Web/HTML) itself enables declarative UIs, of course,
+
+* [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML) itself enables declarative UIs, of course,
 and with adequate input sanitization, a platform could host HTML authored by end users.
-Templating languages like [Handlebars](https://handlebarsjs.com/) or
+* Templating languages like [Handlebars](https://handlebarsjs.com/) or
 [Liquid](https://shopify.github.io/liquid/) add variables and data transformation helpers.
-For a developer building an interactive web application,
+* For a developer building an interactive web application,
 it would be more straightforward to use any standard JavaScript framework, such as [Ember](https://emberjs.com/).
-The [Dhall](https://dhall-lang.org/) configuration language enables
+* The [Dhall](https://dhall-lang.org/) configuration language enables
 safe evaluation of third-party-defined templates and functions, and has a similar spirit to Exclaim,
 although it does not use JSON as its source format.
 
@@ -113,7 +114,7 @@ In contrast, the Ruby side focuses on one-way rendering,
 with more emphasis on bulk rendering a UI for multiple data environments.
 For example, at Salsify a key data entity is a product,
 and this library could take a customer's UI configuration to display info about a product
-and render it for each of many products (data environments) in a large collection.
+and render it for each of many products (data environments).
 
 Furthermore, this gem omits several features of
 [Ember Exclaim](https://github.com/salsify/ember-exclaim):
@@ -227,10 +228,7 @@ the library will attempt to treat it as an Array index when resolving the value 
 
 Note that implementations have __important [Security Considerations](#security-considerations)__.
 
-The Exclaim components you implement may be simple, more complex,
-or a mix depending on what you want to provide as UI building blocks.
-
-Ultimately, component implementations typically return HTML Strings.
+Component implementations typically return HTML Strings.
 As desired, you can leverage a Ruby templating tool like [ERB](https://rubygems.org/gems/erb)
 to do this, but simple string interpolation works too.
 
@@ -243,7 +241,7 @@ They could return some other Ruby value, like a Hash representing the JSON paylo
 
 In addition to components, Exclaim also has helpers.
 The distinction between components and helpers is stronger in Ember Exclaim,
-since there components are Ember [Components](https://api.emberjs.com/ember/release/classes/Component)
+since there components are Ember [Components](https://api.emberjs.com/ember/release/classes/Component),
 while helpers are plain JavaScript functions.
 
 Nevertheless, helpers have the same spirit in the Ruby version:
@@ -288,11 +286,10 @@ These must return a truthy or falsy value to identify their type.
 
 #### Basic Examples
 
-See the `lib/exclaim/implementations` directory for more code examples,
+See also the `lib/exclaim/implementations` directory for more code examples,
 and `spec/integration_spec.rb` to see them in action.
 
-This guide will walk through several examples with notes to explain details.
-First, our simple `text` component in a few implementation forms:
+Returning to the `text` component mentioned above, we could implement it a few different ways.
 
 A lambda:
 
@@ -316,12 +313,12 @@ end
 text_component = Text.new
 ```
 
-If needed, you can use different `call`-able, such as a block or Method object:
+If needed, a different `call`-able, such as a block or Method object:
 
 ```
-def generate_implementation(is_component:, &block)
-  block.define_singleton_method(:component?) { is_component }
-  block
+def generate_implementation(is_component:, &implementation_block)
+  implementation_block.define_singleton_method(:component?) { is_component }
+  implementation_block
 end
 
 text_component = generate_implementation(is_component: true) do |config, env|
@@ -351,7 +348,7 @@ join_helper = Join.new
 ```
 
 Implementations may define both `component?` and `helper?`, as long as they have opposite truth-values.
-Although they only need to define one of them, since one implies the converse value for the other.
+They only need to define one of them, though, since one implies the converse value for the other.
 
 #### Defining the Implementation Map
 
@@ -430,7 +427,7 @@ Ultimately rendering this output, assuming a simple `span` component implementat
 ```
 
 To render the children, the component implementation must accept a `&render_child` block argument
-(though it may name that argument whatever it wants).
+(although it may name that argument whatever it wants).
 
 Note that Ruby lambdas cannot use the `yield` keyword, so they must reference the block argument explicitly:
 ```
@@ -462,7 +459,7 @@ They only referenced their `config` argument. In fact, this library takes care o
 `$bind` references from the `env` prior to handing the resolved `config` to the implementation.
 
 However, the child component example above shows why that `env` argument exists:
-When rendering child components, parent components must pass the env down to them:
+When rendering child components, parent components must pass the `env` down to them:
 
 ```
 render_child.call(child_component, env)
@@ -509,9 +506,9 @@ otherwise just pass down the original `env` when rendering child components.
 When you do need to vary the child `env`, the tradeoffs are:
 
 * Merging a new Hash onto the existing `env` means that the child components will have all the
-existing `env` values plus whatever you add. If you don't know exactly what child components need, this is flexible.
-* On the other hand, it will duplicate the Hash if you use `env.merge`, or mutate it if you do `env.merge!`
-The former could allocate a lot of memory, depending on the size of the `env` Hash
+existing `env` values plus whatever you add. This provides flexibility if you don't know exactly what child components need.
+* On the other hand, merging will duplicate the Hash if you use `env.merge`, or mutate it if you use `env.merge!`
+The former could allocate a lot of memory, depending on the size of the `env`
 and how many nested components the UI config has. The latter could cause subtle bugs if you inadvertently
 overwrite data in the parent `env`. Or if you have called `freeze` on it, mutating will raise a `FrozenError`.
 * Similar concerns exist when just setting a new key on parent `env`.
@@ -590,9 +587,19 @@ that provokes automatic HTTP requests, like an `img` `src` attribute or CSS `url
 * Server Side Request Forgery, if your server will render output that loads URLs, for example if you
 produce a thumbnail image or PDF from rendered HTML, which will prompt fetching images/stylesheets.
 
-As a starting point, declaring the UI with JSON helps, since it is simple to parse and has
-no automatically evaluated elements. Nevertheless, the dynamic nature of the UI declarations can still
-enable malicious content injection. To avoid that, employ following techniques:
+Conceptually, the high-level security guidelines are:
+
+* The UI `config` and rendering `env` are untrusted.
+They intentionally contain values driven by end-users or other external parties.
+* The implementations of components and helpers are trusted.
+They contain arbitrary code authored by you, and will execute on your servers when rendering an arbitrary UI.
+
+Declaring the UI `config` and `env` with JSON helps,
+since it is simple to parse and has no automatically evaluated elements.
+Nevertheless, since those values prompt your implementations to execute,
+they can indirectly enable malicious content injection.
+
+Thus, the goal is to define implementations that avoid that. The following points help with that:
 
 ##### Script Injection
 
@@ -756,7 +763,7 @@ When configuration elements are Array values, it will search through each item.
 ### Utilities
 
 In addition to the `Exclaim::Ui` features documented above,
-this gem provides some top-level utility functions:
+this gem provides top-level utility functions.
 
 **`Exclaim.element_name(config_hash)`**
 
