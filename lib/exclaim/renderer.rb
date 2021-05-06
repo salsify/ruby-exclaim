@@ -2,8 +2,9 @@
 
 module Exclaim
   class Renderer
-    def initialize(parsed_ui)
+    def initialize(parsed_ui, should_escape_html = true)
       @parsed_ui = parsed_ui
+      @should_escape_html = should_escape_html
     end
 
     def call(env: {})
@@ -25,7 +26,7 @@ module Exclaim
     end
 
     def resolve_component_config(component, env)
-      resolve(component.config, env).transform_values! { |value| escape_html!(value) }
+      resolve(component.config, env).transform_values! { |value| @should_escape_html ? escape_html!(value) : value }
     end
 
     def escape_html!(value)
