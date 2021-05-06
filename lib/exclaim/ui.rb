@@ -4,8 +4,9 @@ module Exclaim
   class Ui
     attr_reader :implementation_map, :parsed_ui, :renderer
 
-    def initialize(implementation_map: Exclaim::Implementations.example_implementation_map)
+    def initialize(implementation_map: Exclaim::Implementations.example_implementation_map, should_escape_html: true)
       @implementation_map = Exclaim::ImplementationMap.parse!(implementation_map)
+      @should_escape_html = should_escape_html
     rescue Exclaim::Error
       raise
     rescue StandardError => e
@@ -66,7 +67,7 @@ module Exclaim
 
     def parsed_ui=(value)
       @parsed_ui = value
-      @renderer = Exclaim::Renderer.new(@parsed_ui)
+      @renderer = Exclaim::Renderer.new(@parsed_ui, @should_escape_html)
     end
 
     def bind_paths(config_value, accumulator)
