@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## 0.1.0 - 2021-05-06
+### Added
+- Ability to disable all HTML escaping by setting the `should_escape_html` flag to `false` when instantiating
+  `Exclaim::Ui`, e.g. `Exclaim::Ui.new(implementation_map: my_implementation_map, should_escape_html: false)`
+
 ## 0.0.0 - 2021-02-12
 ### Added
 - Initial version

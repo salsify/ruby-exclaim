@@ -17,6 +17,7 @@
     + [Shorthand Properties and Configuration Defaults](#shorthand-properties-and-configuration-defaults)
     + [Security Considerations](#security-considerations)
       - [Script Injection](#script-injection)
+      - [Disable HTML escaping](#disable-html-escaping)
       - [Unintended Tracking/HTTP Requests](#unintended-trackinghttp-requests)
   * [Querying the Parsed UI](#querying-the-parsed-ui)
   * [Utilities](#utilities)
@@ -632,6 +633,19 @@ If you do need to embed raw HTML, and you are _certain_ you can trust the input,
 your implementation can call `CGI.unescape_html` or `CGI.unescape_element`.
 See [CGI::Util](https://ruby-doc.org/stdlib-3.0.0/libdoc/cgi/rdoc/CGI/Util.html)
 in the Ruby standard library for details.
+
+##### Disable HTML escaping
+
+You can disable HTML escaping altogether by setting the `should_escape_html` flag to `false` when instantiating
+`Exclaim::Ui`. You generally should only do this when the output will not be rendered directly to HTML as this could
+potentially allow script injection and other hazards of unescaped rendering of untrusted user input. If you use this
+flag and the output is ultimately destined for a browser, make sure something downstream between `Exclaim::Ui#render`
+and the browser will escape characters that have special meaning in HTML: `<` `>` `&` `"` `'`
+
+```
+exclaim_ui = Exclaim::Ui.new(implementation_map: my_implementation_map, should_escape_html: false)
+exclaim_ui.render(env: my_environment) # HTML characters will not be escaped
+```
 
 ##### Unintended Tracking/HTTP Requests
 

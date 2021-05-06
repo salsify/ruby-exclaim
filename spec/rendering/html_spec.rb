@@ -43,6 +43,26 @@ describe "rendering HTML configuration values" do
     end
   end
 
+  describe "it does not escape HTML config values when told not to" do
+    let(:exclaim_ui) { Exclaim::Ui.new(implementation_map: implementation_map, should_escape_html: false) }
+    let(:component_implementation) do
+      ->(config, _env) { "#{config['config_value']} #{config['bind_value']}" }
+    end
+
+    it "does not replace <, >, &, \", and ' in string config values" do
+      parsed_component.config = {
+        'config_value' => '<script>alert("Hello");</script>',
+        'bind_value' => bind
+      }
+      env = { 'env_value' => "<img src='http://test.com/tracking-pixel.png?source=A&type=Z'>" }
+
+      result = exclaim_ui.render(env: env)
+      expect(result).to eq(
+        '<script>alert("Hello");</script> <img src=\'http://test.com/tracking-pixel.png?source=A&type=Z\'>'
+      )
+    end
+  end
+
   context "when rendering helpers" do
     let(:component_implementation) do
       ->(config, _env) { config['config_value'] }
