@@ -14,8 +14,7 @@ module Exclaim
     extend self
 
     def example_implementation_map
-      @example_implementation_map ||= begin
-        {
+      @example_implementation_map ||= {
           'each' => EACH_COMPONENT,
           'image' => IMAGE_COMPONENT,
           'if' => IF_HELPER,
@@ -25,7 +24,7 @@ module Exclaim
           'text' => TEXT_COMPONENT,
           'vbox' => VBOX_COMPONENT
         }
-      end
+
     end
   end
 end
