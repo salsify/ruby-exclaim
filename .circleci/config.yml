@@ -1,4 +1,5 @@
 version: 2.1
+
 workflows:
   version: 2
   ruby-exclaim:
@@ -8,18 +9,19 @@ workflows:
 jobs:
   build:
     docker:
-      - image: salsify/ruby_ci:2.7.2
+      - image: $SALSIFY_ECR_REPO/ruby_ci:3.3.5
+        aws_auth:
+          aws_access_key_id: $ECR_AWS_ACCESS_KEY_ID
+          aws_secret_access_key: $ECR_AWS_SECRET_ACCESS_KEY
     environment:
-      RACK_ENV: "test"
-      RAILS_ENV: "test"
       CIRCLE_TEST_REPORTS: "test-results"
     working_directory: ~/ruby-exclaim
     steps:
       - checkout
       - restore_cache:
           keys:
-            - v1-gems-ruby-2.7.2-{{ checksum "ruby-exclaim.gemspec" }}-{{ checksum "Gemfile" }}
-            - v1-gems-ruby-2.7.2-
+            - v1-gems-ruby-3.3.5-{{ checksum "ruby-exclaim.gemspec" }}-{{ checksum "Gemfile" }}
+            - v1-gems-ruby-3.3.5-
       - run:
           name: Install Gems
           command: |
@@ -28,7 +30,7 @@ jobs:
               bundle clean
             fi
       - save_cache:
-          key: v1-gems-ruby-2.7.2-{{ checksum "ruby-exclaim.gemspec" }}-{{ checksum "Gemfile" }}
+          key: v1-gems-ruby-3.3.5-{{ checksum "ruby-exclaim.gemspec" }}-{{ checksum "Gemfile" }}
           paths:
             - "vendor/bundle"
             - "gemfiles/vendor/bundle"
