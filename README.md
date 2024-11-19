@@ -220,10 +220,8 @@ exclaim_ui.render(env: my_environment)
 
 Dot-separated `$bind` paths dig into nested `env` values: `a.b.c` refers to `{ "a" => { "b" => { "c" => "value" } } }`
 
-If a `$bind` path segment is an Integer,
-the library will attempt to treat it as an Array index when resolving the value at render time:
-
-`"my_array.1"` refers to array index 1 in an `env` like `{ "my_array: ["zero", "one", ...] }`
+If the field a `$bind` subpath refers is an Array, the next segment is assumed to be an integer. For example,
+`"my_array.1"` refers to array index 1, value "zero" in an `env` like `{ "my_array: ["zero", "one", ...] }`.
 
 ### Implementing Components and Helpers
 
@@ -800,7 +798,7 @@ After checking out the repo, run `bin/setup` to install dependencies. Then,
 run `rake spec` to run the tests. You can also run `bin/console` for an
 interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. 
+To install this gem onto your local machine, run `bundle exec rake install`.
 
 To release a new version, update the version number in `version.rb`. When merged
 to the default branch, [a GitHub action](.github/workflows/release.yml) will

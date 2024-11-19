@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## 0.1.1 - 2024-11-18
+### Fixed
+- Fix various issues related to path segments that appear to be numbers.
+
 ## 0.1.0 - 2021-05-06
 ### Added
 - Ability to disable all HTML escaping by setting the `should_escape_html` flag to `false` when instantiating

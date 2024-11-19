@@ -14,15 +14,27 @@ module Exclaim
     def path=(value)
       @path = value
       @path_keys = @path.split('.')
-      @path_keys_for_arrays = @path_keys.map do |string|
-        Integer(string)
-      rescue ArgumentError, TypeError
-        string
-      end
     end
 
     def evaluate(env)
-      env.dig(*@path_keys_for_arrays) || env.dig(*@path_keys)
+      obj = env
+
+      @path_keys.each do |key|
+        return nil if !obj.is_a?(Hash) && !obj.is_a?(Array)
+
+        if obj.is_a?(Array)
+          key = begin
+            Integer(key)
+          rescue ArgumentError, TypeError
+            return nil
+          end
+        end
+
+        obj = obj[key]
+        return nil if obj.nil?
+      end
+
+      obj
     end
   end
 end
