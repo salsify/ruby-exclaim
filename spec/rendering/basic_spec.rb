@@ -83,6 +83,20 @@ describe "basic component rendering" do
         env = { 'x' => 'five' }
         expect(exclaim_ui.render(env: env)).to eq('Bound value: five')
       end
+
+      it "assumes path represents a string key when indexing a hash field" do
+        bind = Exclaim::Bind.new(path: '1')
+        parsed_component.config = { 'content' => bind }
+
+        env = { '1' => 5 }
+        expect(exclaim_ui.render(env: env)).to eq('Bound value: 5')
+
+        bind = Exclaim::Bind.new(path: '1')
+        parsed_component.config = { 'content' => bind }
+
+        env = { 1 => 5 }
+        expect(exclaim_ui.render(env: env)).to eq('Bound value: ')
+      end
     end
 
     context "array index as path" do
@@ -92,6 +106,22 @@ describe "basic component rendering" do
 
         env = ['zero', 'one', 'two']
         expect(exclaim_ui.render(env: env)).to eq('Bound value: two')
+      end
+
+      it "assumes path represents an integer key when indexing an array field" do
+        bind = Exclaim::Bind.new(path: 'not_an_integer')
+        parsed_component.config = { 'content' => bind }
+
+        env = []
+        expect(exclaim_ui.render(env: env)).to eq('Bound value: ')
+      end
+
+      it "evaluates to nil when index is out of bounds" do
+        bind = Exclaim::Bind.new(path: '0')
+        parsed_component.config = { 'content' => bind }
+
+        env = []
+        expect(exclaim_ui.render(env: env)).to eq('Bound value: ')
       end
     end
 
